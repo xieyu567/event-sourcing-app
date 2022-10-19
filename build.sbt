@@ -1,7 +1,7 @@
-name := """play-event-sourcing-starter"""
-organization := "com.appliedscala.streaming"
+name := """event-sourcing-app"""
+organization := "effe"
 version := "1.0-SNAPSHOT"
-scalaVersion := "2.13.4"
+scalaVersion := "2.13.10"
 
 lazy val root = (project in file(".")).
   enablePlugins(PlayScala)

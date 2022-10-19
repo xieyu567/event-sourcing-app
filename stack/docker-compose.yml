@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   authdb:
-    image: postgres:12.2
+    image: postgres:14.5
     container_name: practical-pg-auth
     restart: always
     environment:
@@ -9,11 +9,12 @@ services:
       POSTGRES_PASSWORD: scalapass
       POSTGRES_DB: authdb
       PGDATA: /pgdata
-    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
+    command:
+      ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
     ports:
       - "5432:5432"
   eventstoredb:
-    image: postgres:12.2
+    image: postgres:14.5
     container_name: practical-pg-eventstore
     restart: always
     environment:
@@ -21,11 +22,12 @@ services:
       POSTGRES_PASSWORD: scalapass
       POSTGRES_DB: eventstoredb
       PGDATA: /pgdata
-    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
+    command:
+      ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
     ports:
       - "6432:5432"
   validationdb:
-    image: postgres:12.2
+    image: postgres:14.5
     container_name: practical-pg-validation
     restart: always
     environment:
@@ -33,11 +35,12 @@ services:
       POSTGRES_PASSWORD: scalapass
       POSTGRES_DB: validationdb
       PGDATA: /pgdata
-    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
+    command:
+      ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
     ports:
       - "7432:5432"
   graphdb:
-    image: neo4j:4.2.1
+    image: neo4j:4.4.12
     container_name: practical-neo4j
     restart: always
     environment:
