@@ -9,3 +9,8 @@ POST    /register                   controllers.AuthController.registerUser()
 GET     /logout                     controllers.AuthController.logout()
 
 GET     /assets/*file               controllers.MainController.versioned(path="/public", file: Asset)
+
+POST    /api/createTag              controllers.TagController.creeffe567
+ateTag()
+POST    /api/deleteTag              controllers.TagController.deleteTag()
+GET     /api/tags                   controllers.TagController.getTags()

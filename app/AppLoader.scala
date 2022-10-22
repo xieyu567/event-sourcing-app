@@ -3,7 +3,6 @@ import play.api._
 import play.api.db.{DBComponents, HikariCPComponents}
 import play.api.db.evolutions.{DynamicEvolutions, EvolutionsComponents}
 import play.api.routing.Router
-import router.Routes
 import com.softwaremill.macwire._
 import _root_.controllers._
 import dao._
@@ -15,7 +14,7 @@ import services._
 import scala.concurrent.Future
 
 class AppLoader extends ApplicationLoader {
-  def load(context: Context) = {
+  def load(context: Context): Application = {
     LoggerConfigurator(context.environment.classLoader).foreach { configurator =>
       configurator.configure(context.environment)
     }
@@ -29,7 +28,7 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   override lazy val controllerComponents = wire[DefaultControllerComponents]
   lazy val prefix: String = "/"
-  lazy val router: Router = wire[Routes]
+  lazy val router: Router = wire[Router]
   lazy val maybeRouter = Option(router)
 
   override lazy val httpErrorHandler = wire[ProdErrorHandler]
@@ -37,14 +36,20 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   lazy val mainController = wire[MainController]
   lazy val authController = wire[AuthController]
+  lazy val tagController = wire[TagController]
 
   lazy val sessionDao = wire[SessionDao]
   lazy val userDao = wire[UserDao]
+  lazy val logDao = wire[LogDao]
+  lazy val inMemoryReadDao = wire[InMemoryReadDao]
 
   lazy val userService = wire[UserService]
   lazy val authService = wire[AuthService]
   lazy val userAuthAction = wire[UserAuthAction]
   lazy val userAwareAction = wire[UserAwareAction]
+  lazy val readService = wire[ReadService]
+
+  lazy val tagEventProducer = wire[TagEventProducer]
 
   override lazy val dynamicEvolutions = new DynamicEvolutions
 
@@ -55,6 +60,9 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   val onStart: Unit = {
     DBs.setupAll()
-    applicationEvolutions
+    val evolutions = applicationEvolutions
+    if (evolutions.upToDate) {
+      readService.init()
+    }
   }
 }
