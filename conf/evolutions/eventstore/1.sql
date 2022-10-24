@@ -8,6 +8,8 @@ CREATE TABLE logs
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
+# --- !Downs
+
 DROP TABLE logs;
 
 DROP EXTENSION "uuid-ossp";

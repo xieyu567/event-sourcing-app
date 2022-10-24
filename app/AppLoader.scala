@@ -10,6 +10,7 @@ import play.api.mvc.DefaultControllerComponents
 import scalikejdbc.config.DBs
 import security.{UserAuthAction, UserAwareAction}
 import services._
+import router.Routes
 
 import scala.concurrent.Future
 
@@ -28,7 +29,7 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   override lazy val controllerComponents = wire[DefaultControllerComponents]
   lazy val prefix: String = "/"
-  lazy val router: Router = wire[Router]
+  lazy val router: Router = wire[Routes]
   lazy val maybeRouter = Option(router)
 
   override lazy val httpErrorHandler = wire[ProdErrorHandler]
