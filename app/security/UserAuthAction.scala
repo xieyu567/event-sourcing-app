@@ -7,18 +7,20 @@ import services.AuthService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class UserAuthRequest[A](user: User,
-  request: Request[A]) extends  WrappedRequest[A](request)
+case class UserAuthRequest[A](user: User, request: Request[A]) extends WrappedRequest[A](request)
 
-class UserAuthAction(authService: AuthService, ec: ExecutionContext,
-                     playBodyParsers: PlayBodyParsers)
-  extends ActionBuilder[UserAuthRequest, AnyContent] {
+class UserAuthAction(
+    authService: AuthService,
+    ec: ExecutionContext,
+    playBodyParsers: PlayBodyParsers)
+    extends ActionBuilder[UserAuthRequest, AnyContent] {
 
-  override implicit val executionContext = ec
-  override def parser = playBodyParsers.defaultBodyParser
+  override implicit val executionContext: ExecutionContext = ec
+  override def parser: BodyParser[AnyContent] = playBodyParsers.defaultBodyParser
 
-  def invokeBlock[A](request: Request[A],
-            block: UserAuthRequest[A] => Future[Result]): Future[Result] = {
+  def invokeBlock[A](
+      request: Request[A],
+      block: UserAuthRequest[A] => Future[Result]): Future[Result] = {
     authService.checkCookie(request).flatMap {
       case None => UserAuthAction.unauthorized(request)
       case Some(user) => block(UserAuthRequest(user, request))
@@ -27,14 +29,18 @@ class UserAuthAction(authService: AuthService, ec: ExecutionContext,
 }
 
 object UserAuthAction {
-  val log = Logger("security.UserAuthAction")
+  val log: Logger = Logger("security.UserAuthAction")
 
   val RequestUrl = "X-Auth-Request-Url"
 
-  def redirectAfterLogin(request : Request[AnyContent], cookie: Cookie): Result = {
+  def redirectAfterLogin(request: Request[AnyContent], cookie: Cookie): Result = {
     val maybeRequestedUrl = request.cookies.get(RequestUrl)
     maybeRequestedUrl match {
-      case Some(url) => Results.Redirect(url.value).discardingCookies(DiscardingCookie(RequestUrl)).withCookies(cookie)
+      case Some(url) =>
+        Results
+          .Redirect(url.value)
+          .discardingCookies(DiscardingCookie(RequestUrl))
+          .withCookies(cookie)
       case None => Results.Redirect("/").withCookies(cookie)
     }
   }
@@ -45,7 +51,8 @@ object UserAuthAction {
       Future.successful(Results.Unauthorized)
     } else {
       val requestedUrl = request.path
-      Future.successful(Results.Redirect("/login").withCookies(Cookie(UserAuthAction.RequestUrl, requestedUrl)))
+      Future.successful(
+        Results.Redirect("/login").withCookies(Cookie(UserAuthAction.RequestUrl, requestedUrl)))
     }
   }
 

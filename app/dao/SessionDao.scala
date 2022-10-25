@@ -6,7 +6,6 @@ import scalikejdbc._
 
 import scala.concurrent.Future
 
-
 class SessionDao {
 
   import util.ThreadPools.IO
@@ -22,8 +21,10 @@ class SessionDao {
 
   def findSession(token: String): Future[Option[UserSession]] = Future {
     NamedDB(Symbol("auth")).readOnly { implicit session =>
-      sql"select * from sessions where token = $token".
-        map(UserSession.fromDb).headOption().apply()
+      sql"select * from sessions where token = $token"
+        .map(UserSession.fromDb)
+        .headOption()
+        .apply()
     }
   }
 

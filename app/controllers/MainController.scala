@@ -5,19 +5,20 @@ import model._
 import play.api.mvc._
 import security.{UserAuthAction, UserAwareAction, UserAwareRequest}
 
-
-class MainController(components: ControllerComponents, assets: Assets,
-                     userAuthAction: UserAuthAction, userAwareAction: UserAwareAction)
-  extends AbstractController(components) {
+class MainController(
+    components: ControllerComponents,
+    assets: Assets,
+    userAuthAction: UserAuthAction,
+    userAwareAction: UserAwareAction)
+    extends AbstractController(components) {
 
   import util.ThreadPools.CPU
 
-  def index() = userAwareAction { request =>
-    Ok(views.html.pages.react(buildNavData(request),
-      WebPageData("Home")))
+  def index(): Action[AnyContent] = userAwareAction { request =>
+    Ok(views.html.pages.react(buildNavData(request), WebPageData("Home")))
   }
 
-  def error500() = Action {
+  def error500(): Action[AnyContent] = Action {
     InternalServerError(views.html.errorPage())
   }
 
@@ -25,5 +26,5 @@ class MainController(components: ControllerComponents, assets: Assets,
     NavigationData(request.user, isLoggedIn = request.user.isDefined)
   }
 
-  def versioned(path: String, file: Asset) = assets.versioned(path, file)
+  def versioned(path: String, file: Asset): Action[AnyContent] = assets.versioned(path, file)
 }

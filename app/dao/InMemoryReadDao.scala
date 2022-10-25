@@ -35,17 +35,23 @@ class InMemoryReadDao(implicit mat: Materializer) {
   }
 
   def processEvents(events: Seq[LogRecord]): Future[Unit] = {
-    Source(events).mapAsync(parallelism = 1) { event =>
-      ReadQueue.offer(UpdateStateRequest(event))
-    }.runWith(Sink.ignore).map(_ => ())
+    Source(events)
+      .mapAsync(parallelism = 1) { event =>
+        ReadQueue.offer(UpdateStateRequest(event))
+      }
+      .runWith(Sink.ignore)
+      .map(_ => ())
   }
 
   def getState: Future[ApplicationState] = {
     val promise = Promise[ApplicationState]()
-    ReadQueue.offer(GetStateRequest(state => {
-      promise.success(state)
-    })).flatMap { _ => promise.future
-    }
+    ReadQueue
+      .offer(GetStateRequest(state => {
+        promise.success(state)
+      }))
+      .flatMap { _ =>
+        promise.future
+      }
   }
 
   def getTags: Seq[Tag] = {
@@ -58,13 +64,16 @@ class InMemoryReadDao(implicit mat: Materializer) {
   }
 
   private val ReadQueue = {
-    Source.queue[ReadServiceRequest](bufferSize = 100,
-      OverflowStrategy.dropTail).map {
-      case GetStateRequest(callback) =>
-        callback.apply(getCurrentState)
-      case UpdateStateRequest(event) =>
-        updateState(event)
-    }.to(Sink.ignore).run()
+    Source
+      .queue[ReadServiceRequest](bufferSize = 100, OverflowStrategy.dropTail)
+      .map {
+        case GetStateRequest(callback) =>
+          callback.apply(getCurrentState)
+        case UpdateStateRequest(event) =>
+          updateState(event)
+      }
+      .to(Sink.ignore)
+      .run()
   }
 
   sealed trait ReadServiceRequest
@@ -73,4 +82,3 @@ class InMemoryReadDao(implicit mat: Materializer) {
 
   case class UpdateStateRequest(event: LogRecord) extends ReadServiceRequest
 }
-

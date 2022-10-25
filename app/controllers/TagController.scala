@@ -8,11 +8,13 @@ import security.UserAuthAction
 import services.{ReadService, TagEventProducer}
 
 import java.util.UUID
-import scala.concurrent.Future
 
-class TagController(components: ControllerComponents, tagEventProducer: TagEventProducer,
-                    userAuthAction: UserAuthAction, readService: ReadService)
-  extends AbstractController(components) {
+class TagController(
+    components: ControllerComponents,
+    tagEventProducer: TagEventProducer,
+    userAuthAction: UserAuthAction,
+    readService: ReadService)
+    extends AbstractController(components) {
 
   import util.ThreadPools.CPU
 
@@ -28,26 +30,22 @@ class TagController(components: ControllerComponents, tagEventProducer: TagEvent
     mapping("id" -> uuid)(DeleteTagData.apply)(DeleteTagData.unapply)
   }
 
-  def createTag(): Action[AnyContent] = userAuthAction.async { implicit request =>
-    createTagForm.bindFromRequest().fold(
-      _ => Future.successful(BadRequest),
-      data => {
-        tagEventProducer.createTag(data.text, request.user.userId).map { tags =>
-          Ok(Json.toJson(tags))
-        }
-      }
-    )
+  def createTag(): Action[AnyContent] = userAuthAction { implicit request =>
+    createTagForm
+      .bindFromRequest()
+      .fold(_ => BadRequest, data => {
+        tagEventProducer.createTag(data.text, request.user.userId)
+        Ok
+      })
   }
 
-  def deleteTag(): Action[AnyContent] = userAuthAction.async { implicit request =>
-    deleteTagForm.bindFromRequest().fold(
-      _ => Future.successful(BadRequest),
-      data => {
-        tagEventProducer.deletedTag(data.id, request.user.userId).map { tags =>
-          Ok(Json.toJson(tags))
-        }
-      }
-    )
+  def deleteTag(): Action[AnyContent] = userAuthAction { implicit request =>
+    deleteTagForm
+      .bindFromRequest()
+      .fold(_ => BadRequest, data => {
+        tagEventProducer.deletedTag(data.id, request.user.userId)
+        Ok
+      })
   }
 
   def getTags: Action[AnyContent] = Action.async { implicit request =>

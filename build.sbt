@@ -26,5 +26,6 @@ libraryDependencies ++= Seq(
   "org.scalikejdbc" %% "scalikejdbc" % "3.5.0",
   "org.scalikejdbc" %% "scalikejdbc-config" % "3.5.0",
   "ch.qos.logback" % "logback-classic" % "1.4.4",
-  "de.svenkubiak" % "jBCrypt" % "0.4.3"
+  "de.svenkubiak" % "jBCrypt" % "0.4.3",
+  "com.typesafe.akka" %% "akka-stream-kafka" % "3.0.1"
 )

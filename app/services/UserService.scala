@@ -5,7 +5,6 @@ import dao.UserDao
 
 import scala.concurrent.Future
 
-
 class UserService(userDao: UserDao) {
   import util.ThreadPools.CPU
   def getUserFullNameMap: Future[Map[UUID, String]] = {
