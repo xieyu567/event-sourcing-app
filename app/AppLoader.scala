@@ -6,6 +6,7 @@ import play.api.routing.Router
 import com.softwaremill.macwire._
 import _root_.controllers._
 import dao._
+import messaging.MessageLogRegistry
 import play.api.mvc.DefaultControllerComponents
 import scalikejdbc.config.DBs
 import security.{UserAuthAction, UserAwareAction}
@@ -23,14 +24,17 @@ class AppLoader extends ApplicationLoader {
   }
 }
 
-class AppComponents(context: Context) extends BuiltInComponentsFromContext(context)
-  with EvolutionsComponents with DBComponents
-  with HikariCPComponents with AssetsComponents {
+class AppComponents(context: Context)
+    extends BuiltInComponentsFromContext(context)
+    with EvolutionsComponents
+    with DBComponents
+    with HikariCPComponents
+    with AssetsComponents {
 
   override lazy val controllerComponents = wire[DefaultControllerComponents]
   lazy val prefix: String = "/"
   lazy val router: Router = wire[Routes]
-  lazy val maybeRouter = Option(router)
+  lazy val maybeRouter: Option[Router] = Option(router)
 
   override lazy val httpErrorHandler = wire[ProdErrorHandler]
   override lazy val httpFilters = Seq()
@@ -49,8 +53,10 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
   lazy val userAuthAction = wire[UserAuthAction]
   lazy val userAwareAction = wire[UserAwareAction]
   lazy val readService = wire[ReadService]
+  lazy val clientBroadcastService = wire[ClientBroadcastService]
 
   lazy val tagEventProducer = wire[TagEventProducer]
+  lazy val messageRegistry = wire[MessageLogRegistry]
 
   override lazy val dynamicEvolutions = new DynamicEvolutions
 

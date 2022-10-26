@@ -2,12 +2,16 @@ package controllers
 
 import controllers.Assets.Asset
 import model._
+import play.api.http.ContentTypes
+import play.api.libs.EventSource
 import play.api.mvc._
 import security.{UserAuthAction, UserAwareAction, UserAwareRequest}
+import services.ClientBroadcastService
 
 class MainController(
     components: ControllerComponents,
     assets: Assets,
+    clientBroadcastService: ClientBroadcastService,
     userAuthAction: UserAuthAction,
     userAwareAction: UserAwareAction)
     extends AbstractController(components) {
@@ -27,4 +31,9 @@ class MainController(
   }
 
   def versioned(path: String, file: Asset): Action[AnyContent] = assets.versioned(path, file)
+
+  def serverEventStream(): Action[AnyContent] = userAwareAction { request =>
+    val source = clientBroadcastService.createEventStream(request.user.map(_.userId))
+    Ok.chunked(source.via(EventSource.flow)).as(ContentTypes.EVENT_STREAM)
+  }
 }

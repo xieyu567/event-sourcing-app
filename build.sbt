@@ -1,10 +1,7 @@
 name := """event-sourcing-app"""
 
-val commonSettings = Seq(
-  version := "1.0-SNAPSHOT",
-  scalaVersion := "2.13.10",
-  organization := "effe"
-)
+val commonSettings =
+  Seq(version := "1.0-SNAPSHOT", scalaVersion := "2.13.10", organization := "effe")
 
 lazy val root = (project in file("."))
   .settings(commonSettings)
@@ -27,5 +24,5 @@ libraryDependencies ++= Seq(
   "org.scalikejdbc" %% "scalikejdbc-config" % "3.5.0",
   "ch.qos.logback" % "logback-classic" % "1.4.4",
   "de.svenkubiak" % "jBCrypt" % "0.4.3",
-  "com.typesafe.akka" %% "akka-stream-kafka" % "3.0.1"
-)
+  "com.typesafe.akka" %% "akka-stream-kafka" % "3.0.1",
+  "io.reactivex.rxjava3" % "rxjava" % "3.1.5")
