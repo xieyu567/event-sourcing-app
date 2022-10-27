@@ -84,6 +84,7 @@ services:
     environment:
       ALLOW_PLAINTEXT_LISTENER: yes
       KAFKA_CFG_ZOOKEEPER_CONNECT: practical-zookeeper:2181
+      KAFKA_CFG_LISTENERS=PLAINTEXT: //:9092
     networks:
       - wpnet
 networks:

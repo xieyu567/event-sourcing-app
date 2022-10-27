@@ -39,29 +39,33 @@ class AppComponents(context: Context)
   override lazy val httpErrorHandler = wire[ProdErrorHandler]
   override lazy val httpFilters = Seq()
 
-  lazy val mainController = wire[MainController]
-  lazy val authController = wire[AuthController]
-  lazy val tagController = wire[TagController]
+  lazy val mainController: MainController = wire[MainController]
+  lazy val authController: AuthController = wire[AuthController]
+  lazy val tagController: TagController = wire[TagController]
 
-  lazy val sessionDao = wire[SessionDao]
-  lazy val userDao = wire[UserDao]
-  lazy val logDao = wire[LogDao]
-  lazy val inMemoryReadDao = wire[InMemoryReadDao]
+  lazy val sessionDao: SessionDao = wire[SessionDao]
+  lazy val userDao: UserDao = wire[UserDao]
+  lazy val logDao: LogDao = wire[LogDao]
+  lazy val inMemoryReadDao: InMemoryReadDao = wire[InMemoryReadDao]
 
-  lazy val userService = wire[UserService]
-  lazy val authService = wire[AuthService]
-  lazy val userAuthAction = wire[UserAuthAction]
-  lazy val userAwareAction = wire[UserAwareAction]
-  lazy val readService = wire[ReadService]
-  lazy val clientBroadcastService = wire[ClientBroadcastService]
+  lazy val userService: UserService = wire[UserService]
+  lazy val authService: AuthService = wire[AuthService]
+  lazy val userAuthAction: UserAuthAction = wire[UserAuthAction]
+  lazy val userAwareAction: UserAwareAction = wire[UserAwareAction]
+  lazy val readService: ReadService = wire[ReadService]
+  lazy val clientBroadcastService: ClientBroadcastService = wire[ClientBroadcastService]
 
-  lazy val tagEventProducer = wire[TagEventProducer]
-  lazy val messageRegistry = wire[MessageLogRegistry]
+  lazy val tagEventProducer: TagEventProducer = wire[TagEventProducer]
+  lazy val messageRegistry: MessageLogRegistry = wire[MessageLogRegistry]
+  lazy val tagEventConsumer: TagEventConsumer = wire[TagEventConsumer]
+  lazy val logRecordConsumer: LogRecordConsumer = wire[LogRecordConsumer]
+  lazy val consumerAggregator: ConsumerAggregator = wire[ConsumerAggregator]
 
   override lazy val dynamicEvolutions = new DynamicEvolutions
 
   applicationLifecycle.addStopHook { () =>
     DBs.closeAll()
+    messageRegistry.shutdown()
     Future.successful(())
   }
 
